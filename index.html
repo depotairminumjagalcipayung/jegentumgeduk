@@ -65,21 +65,7 @@
     video.object3D.scale.set(scale, scale, scale);
   }
 
-  // Place once
-  document.body.addEventListener('click', () => {
-    if (!placed) {
-      video.setAttribute('visible', true);
-      fadeIn();
-      placed = true;
-    }
-  });
-
-  // Run scaling every frame
-  function tick() {
-    updateScale();
-    requestAnimationFrame(tick);
-  }
-  tick();
+  ();
 </script>
 
 </body>
