@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>test</title>
+  <title>AR.js Marker Trigger World Video</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -24,15 +24,14 @@
     visible="false"
   ></a-marker>
 
-  <!-- World-anchored video -->
-  <a-video
+  <!-- World anchored video plane (NOT a-video) -->
+  <a-entity
     id="worldVideo"
-    src="#vid"
-    width="1.6"
-    height="0.9"
     visible="false"
+    geometry="primitive: plane; width: 1.6; height: 0.9"
+    material="shader: flat; src: #vid; side: double"
     rotation="-90 0 0"
-  ></a-video>
+  ></a-entity>
 
   <a-entity camera></a-entity>
 </a-scene>
@@ -52,7 +51,7 @@
 window.addEventListener("DOMContentLoaded", () => {
 
   const marker = document.querySelector("#triggerMarker");
-  const video = document.querySelector("#worldVideo");
+  const videoPlane = document.querySelector("#worldVideo");
 
   let placed = false;
 
@@ -60,20 +59,20 @@ window.addEventListener("DOMContentLoaded", () => {
     if (placed) return;
 
     const pos = new THREE.Vector3();
-
-    // ONLY position (no rotation)
     marker.object3D.getWorldPosition(pos);
-    video.object3D.position.copy(pos);
 
-    // Force stable orientation
-    video.object3D.rotation.set(
-      -Math.PI / 2, // lay flat like a poster
+    // World position ONLY
+    videoPlane.object3D.position.copy(pos);
+
+    // Hard world rotation (no camera influence)
+    videoPlane.object3D.rotation.set(
+      -Math.PI / 2,
       0,
       0
     );
 
-    video.object3D.updateMatrixWorld(true);
-    video.setAttribute("visible", true);
+    videoPlane.object3D.updateMatrixWorld(true);
+    videoPlane.setAttribute("visible", true);
 
     placed = true;
   });
