@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>AR.js Marker Video</title>
+  <title>QR Marker Video AR</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -15,13 +15,13 @@
   arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
 >
 
-  <!-- Marker is the anchor -->
+  <!-- QR CODE AS MARKER -->
   <a-marker
     type="pattern"
     url="pattern-qr.patt"
   >
 
-    <!-- World-stable video (marker-relative) -->
+    <!-- Video anchored to QR -->
     <a-entity
       geometry="primitive: plane; width: 1.6; height: 0.9"
       material="shader: flat; src: #vid; side: double"
