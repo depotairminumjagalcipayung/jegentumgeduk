@@ -9,43 +9,6 @@
 <body style="margin:0; overflow:hidden;">
 
 
-<script>
-  const marker = document.querySelector('#marker');
-  const worldVideo = document.querySelector('#worldVideo');
-
-  let locked = false;
-
-  marker.addEventListener('markerFound', () => {
-    if (locked) return;
-
-    const markerObj = marker.object3D;
-
-    // Get marker WORLD position
-    const pos = new THREE.Vector3();
-    markerObj.getWorldPosition(pos);
-
-    // Place world video
-    worldVideo.object3D.position.copy(pos);
-
-    // Lift video UP in world space
-    worldVideo.object3D.position.y += 1;
-
-    // Manually orient video to face camera
-    worldVideo.object3D.rotation.set(0, 0, 0);
-
-    // Show + fade in
-    worldVideo.setAttribute('visible', true);
-    worldVideo.setAttribute('animation__fade', {
-      property: 'material.opacity',
-      from: 0.01,
-      to: 1,
-      dur: 200
-    });
-
-    locked = true;
-  });
-</script>
-
 <a-scene
   embedded
   vr-mode-ui="enabled: false"
@@ -91,6 +54,43 @@
   </a-video>
 
 </a-scene>
+
+<script>
+AFRAME.registerComponent("persist-on-marker", {
+  init() {
+    const marker = document.querySelector("#marker");
+    const markerVideo = document.querySelector("#markerVideo");
+    const worldVideo = document.querySelector("#worldVideo");
+
+    let locked = false;
+
+    marker.addEventListener("markerFound", () => {
+      if (locked) return;
+
+      // Get world position & rotation
+      const worldPos = new THREE.Vector3();
+      const worldQuat = new THREE.Quaternion();
+
+      markerVideo.object3D.getWorldPosition(worldPos);
+      markerVideo.object3D.getWorldQuaternion(worldQuat);
+
+      // Apply to world video
+      worldVideo.object3D.position.copy(worldPos);
+      worldVideo.object3D.quaternion.copy(worldQuat);
+
+      worldVideo.setAttribute("visible", "true");
+
+      // Optional: hide marker version
+      markerVideo.setAttribute("visible", "false");
+
+      locked = true;
+    });
+  }
+});
+
+// Attach component
+document.querySelector("a-scene").setAttribute("persist-on-marker", "");
+</script>
 
 
 </body>
