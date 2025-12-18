@@ -2,19 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AR.js Marker Trigger HUD Video</title>
+  <title>AR.js Marker Trigger HUD Video (No Flash)</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
   <style>
     body { margin: 0; overflow: hidden; }
   </style>
 
-  <!-- Camera-space distance scaling -->
   <script>
     AFRAME.registerComponent("scale-by-z", {
       schema: {
@@ -49,7 +45,7 @@
   renderer="antialias: false; precision: low;"
 >
 
-  <!-- MARKER USED ONLY AS TRIGGER -->
+  <!-- Marker ONLY as trigger -->
   <a-marker
     id="triggerMarker"
     type="pattern"
@@ -60,18 +56,15 @@
   <!-- Camera -->
   <a-entity camera>
 
-    <!-- CAMERA-SPACE VIDEO (HUD) -->
+    <!-- HUD Video -->
     <a-video
       id="videoHUD"
       src="#vid"
       width="1.6"
       height="0.9"
       position="0 0 -2"
-      rotation="0 0 0"
       visible="false"
       scale-by-z
-      autoplay
-      loop
       muted
       playsinline
       webkit-playsinline
@@ -81,11 +74,10 @@
 
 </a-scene>
 
-<!-- Video asset -->
+<!-- IMPORTANT: no autoplay here -->
 <video
   id="vid"
   src="video.mp4"
-  autoplay
   loop
   muted
   playsinline
@@ -96,22 +88,27 @@
 window.addEventListener("DOMContentLoaded", () => {
 
   const marker = document.querySelector("#triggerMarker");
-  const video  = document.querySelector("#videoHUD");
-  const scene  = document.querySelector("a-scene");
+  const videoEntity = document.querySelector("#videoHUD");
+  const videoEl = document.querySelector("#vid");
+  const scene = document.querySelector("a-scene");
 
   let activated = false;
 
-  marker.addEventListener("markerFound", () => {
+  marker.addEventListener("markerFound", async () => {
     if (activated) return;
     activated = true;
 
-    // Show HUD video
-    video.setAttribute("visible", true);
+    // Start video ONLY after trigger (prevents flash)
+    try {
+      await videoEl.play();
+    } catch (e) {
+      console.warn("Video play blocked until user interaction");
+    }
 
-    // Disable marker tracking for performance
+    videoEntity.setAttribute("visible", true);
+
+    // Disable tracking & remove marker
     scene.setAttribute("arjs", "trackingMethod: none;");
-
-    // Remove marker entity entirely
     marker.parentNode.removeChild(marker);
   });
 
