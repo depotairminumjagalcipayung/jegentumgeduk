@@ -8,51 +8,6 @@
 
 <body style="margin:0; overflow:hidden;">
 
-<a-scene
-  embedded
-  vr-mode-ui="enabled: false"
-  arjs="sourceType: webcam; debugUIEnabled: false;">
-
-  <!-- Camera -->
-  <a-entity id="cam" camera></a-entity>
-
-  <!-- Marker -->
-  <a-marker
-    id="marker"
-    type="pattern"
-    url="pattern-qr.patt">
-
-    <!-- Temporary video (follows marker) -->
-    <a-video
-      id="markerVideo"
-      src="video.mp4"
-      position="0 0 0"
-      rotation="-90 0 0"
-      width="1.4"
-      height="0.8"
-      material="shader: flat; opacity: 0.6"
-      muted
-      autoplay
-      playsinline>
-    </a-video>
-
-  </a-marker>
-
-  <!-- World-locked clone -->
-  <a-video
-    id="worldVideo"
-    src="video.mp4"
-    visible="false"
-    width="1.6"
-    height="0.9"
-    material="shader: flat; opacity: 0.6"
-    muted
-    autoplay
-    loop
-    playsinline>
-  </a-video>
-
-</a-scene>
 
 <script>
   const marker = document.querySelector('#marker');
@@ -87,9 +42,56 @@
       dur: 200
     });
 
-    locked = false;
+    locked = true;
   });
 </script>
+
+<a-scene
+  embedded
+  vr-mode-ui="enabled: false"
+  arjs="sourceType: webcam; debugUIEnabled: false;">
+
+  <!-- Camera -->
+  <a-entity id="cam" camera></a-entity>
+
+  <!-- Marker -->
+  <a-marker
+    id="marker"
+    type="pattern"
+    url="pattern-qr.patt">
+
+    <!-- Temporary video (follows marker) -->
+    <a-video
+      id="markerVideo"
+      src="video.mp4"
+      position="0 0 -2"
+      rotation="-90 0 0"
+      width="1.4"
+      height="0.8"
+      material="shader: flat; opacity: 0.6"
+      muted
+      autoplay
+      playsinline>
+    </a-video>
+
+  </a-marker>
+
+  <!-- World-locked clone -->
+  <a-video
+    id="worldVideo"
+    src="video.mp4"
+    visible="false"
+    width="16"
+    height="9"
+    material="shader: flat; opacity: 0.6"
+    muted
+    autoplay
+    loop
+    playsinline>
+  </a-video>
+
+</a-scene>
+
 
 </body>
 </html>
