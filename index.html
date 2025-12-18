@@ -16,48 +16,94 @@
   <!-- Camera -->
   <a-entity id="cam" camera></a-entity>
 
-  <!-- World-locked video -->
+  <!-- Marker -->
+  <a-marker
+    id="marker"
+    type="pattern"
+    url="pattern-qr.patt">
+
+    <!-- Temporary video (follows marker) -->
+    <a-video
+      id="markerVideo"
+      src="video.mp4"
+      position="0 0.8 0"
+      rotation="-90 0 0"
+      width="1.4"
+      height="0.8"
+      material="shader: flat; opacity: 0"
+      muted
+      autoplay
+      loop
+      playsinline>
+    </a-video>
+
+  </a-marker>
+
+  <!-- World-locked clone -->
   <a-video
-    id="jegentumgeduk"
+    id="worldVideo"
     src="video.mp4"
-  position="0 1.6 -2"
-  rotation="0 0 0"
-    width="1.6"
-    height="0.9"
-    visible="true"
+    visible="false"
+    width="1.4"
+    height="0.8"
+    material="shader: flat; opacity: 0"
+    muted
     autoplay
-    loop>
+    loop
+    playsinline>
   </a-video>
 
 </a-scene>
 
-<script
-  const video = document.querySelector('#arVideo');
-  const camera = document.querySelector('#cam');
-  let placed = false;
-  const baseDistance = 2;   // meters
-  const baseScale = 1;
+<script>
+  const marker = document.querySelector('#marker');
+  const markerVideo = document.querySelector('#markerVideo');
+  const worldVideo = document.querySelector('#worldVideo');
 
-  
+  let locked = false;
 
-  // Distance-based scaling
-  function updateScale() {
-    if (!placed) return;
+  // Fade helper
+  function fadeIn(el) {
+    el.setAttribute('animation__fade', {
+      property: 'material.opacity',
+      from: 0,
+      to: 1,
+      dur: 800,
+      easing: 'easeOutQuad'
+    });
+  }
 
-    const camPos = camera.object3D.position;
-    const vidPos = video.object3D.position;
+  // When marker is found
+  marker.addEventListener('markerFound', () => {
+    if (locked) return;
 
-    const dx = camPos.x - vidPos.x;
-    const dy = camPos.y - vidPos.y;
-    const dz = camPos.z - vidPos.z;
+    // Show marker video
+    markerVideo.setAttribute('material.opacity', 1);
 
-    const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
-    const scale = (distance / baseDistance) * baseScale;
+    // Get marker world position & rotation
+    const markerObj = marker.object3D;
+    const pos = new THREE.Vector3();
+    const rot = new THREE.Euler();
 
-    video.object3D.scale.set(scale, scale, scale);
-  }>
+    markerObj.getWorldPosition(pos);
+    markerObj.getWorldRotation(rot);
 
-  
+    // Place world-locked video
+    worldVideo.object3D.position.copy(pos);
+    worldVideo.object3D.rotation.copy(rot);
+
+    // Lift slightly upward
+    worldVideo.object3D.position.y += 0.8;
+
+    // Activate world lock
+    worldVideo.setAttribute('visible', true);
+    fadeIn(worldVideo);
+
+    locked = true;
+
+    // Hide marker video
+    markerVideo.setAttribute('visible', false);
+  });
 </script>
 
 </body>
