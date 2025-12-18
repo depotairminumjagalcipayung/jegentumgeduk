@@ -16,6 +16,7 @@
 
   <!-- Camera -->
   <a-entity id="cam" camera></a-entity>
+</a-scene>
 
   <!-- Marker -->
   <a-marker
@@ -28,7 +29,7 @@
       id="markerVideo"
       src="video.mp4"
       position="0 0 -2"
-      rotation="0 -90 0"
+      rotation="0 0 0"
       width="360"
       height="144"
       material="shader: flat; opacity: 0.6"
@@ -44,8 +45,8 @@
     id="worldVideo"
     src="video.mp4"
     visible="false"
-    width="16"
-    height="9"
+    width="360"
+    height="144"
     material="shader: flat; opacity: 0.6"
     muted
     autoplay
@@ -53,7 +54,6 @@
     playsinline>
   </a-video>
 
-</a-scene>
 
 <script>
 AFRAME.registerComponent("persist-on-marker", {
