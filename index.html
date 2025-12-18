@@ -31,6 +31,7 @@
     width="1.6"
     height="0.9"
     visible="false"
+    rotation="-90 0 0"
   ></a-video>
 
   <a-entity camera></a-entity>
@@ -59,14 +60,19 @@ window.addEventListener("DOMContentLoaded", () => {
     if (placed) return;
 
     const pos = new THREE.Vector3();
-    const quat = new THREE.Quaternion();
 
+    // ONLY position (no rotation)
     marker.object3D.getWorldPosition(pos);
-    marker.object3D.getWorldQuaternion(quat);
-
     video.object3D.position.copy(pos);
-    video.object3D.quaternion.copy(quat);
 
+    // Force stable orientation
+    video.object3D.rotation.set(
+      -Math.PI / 2, // lay flat like a poster
+      0,
+      0
+    );
+
+    video.object3D.updateMatrixWorld(true);
     video.setAttribute("visible", true);
 
     placed = true;
