@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Session Clamp AR.js</title>
+  <meta charset="utf-8" />
+  <title>QR Marker Video AR</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -15,25 +15,26 @@
   arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
 >
 
-  <!-- Marker used ONCE -->
+  <!-- QR CODE AS MARKER -->
   <a-marker
-    id="qrMarker"
     type="pattern"
     url="pattern-qr.patt"
-    emitevents="true"
-  ></a-marker>
+  >
 
-  <!-- Floating video (world illusion) -->
-  <a-entity
-    id="video"
-    visible="false"
-    geometry="primitive: plane; width: 8; height: 4.5"
-    material="shader: flat; src: #vid; side: double"
-  ></a-entity>
+    <!-- Video anchored to QR -->
+    <a-entity
+      geometry="primitive: plane; width: 8; height: 4.5"
+      material="shader: flat; src: #vid; side: double"
+      position="0 0 0"
+      rotation="0 0 0"
+    ></a-entity>
+
+  </a-marker>
 
   <a-entity camera></a-entity>
 </a-scene>
 
+<!-- Video asset -->
 <video
   id="vid"
   src="video.mp4"
@@ -41,35 +42,8 @@
   loop
   muted
   playsinline
+  webkit-playsinline
 ></video>
-
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-
-  const marker = document.querySelector("#qrMarker");
-  const video = document.querySelector("#video");
-
-  let locked = false;
-
-  marker.addEventListener("markerFound", () => {
-    if (locked) return;
-
-    const pos = new THREE.Vector3();
-    marker.object3D.getWorldPosition(pos);
-
-    // Float above table
-    pos.y += 0.8;
-
-    video.object3D.position.copy(pos);
-    video.object3D.rotation.set(-Math.PI / 2, 0, 0);
-    video.object3D.updateMatrixWorld(true);
-
-    video.setAttribute("visible", true);
-    locked = true;
-  });
-
-});
-</script>
 
 </body>
 </html>
