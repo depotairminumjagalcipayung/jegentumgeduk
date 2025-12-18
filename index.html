@@ -14,17 +14,21 @@
   arjs="trackingMethod: best; sourceType: webcam;"
 >
   <!-- Marker -->
-  <a-marker id="marker" type="pattern" url="pattern-qr.patt">
-    <a-video
-      id="markerVideo"
-      src="#vid"
-      width="1.6"
-      height="0.9"
-      position="0 0 0"
-      rotation="-90 0 0"
-    ></a-video>
-  </a-marker>
-
+  <a-marker
+  id="marker"
+  type="pattern"
+  url="pattern-qr.patt"
+  emitevents="true"
+>
+  <a-video
+    id="markerVideo"
+    src="#vid"
+    width="1.6"
+    height="0.9"
+    position="0 0 0"
+    rotation="-90 0 0"
+  ></a-video>
+</a-marker>
   <!-- World-space clone (initially hidden) -->
   <a-video
     id="worldVideo"
@@ -48,40 +52,37 @@
 ></video>
 
 <script>
-AFRAME.registerComponent("persist-on-marker", {
-  init() {
-    const marker = document.querySelector("#marker");
-    const markerVideo = document.querySelector("#markerVideo");
-    const worldVideo = document.querySelector("#worldVideo");
+window.addEventListener("DOMContentLoaded", () => {
+  const marker = document.querySelector("#marker");
+  const markerVideo = document.querySelector("#markerVideo");
+  const worldVideo = document.querySelector("#worldVideo");
 
-    let locked = false;
+  let locked = false;
 
-    marker.addEventListener("markerFound", () => {
-      if (locked) return;
+  marker.addEventListener("markerFound", () => {
+    console.log("MARKER FOUND");
 
-      // Get world position & rotation
-      const worldPos = new THREE.Vector3();
-      const worldQuat = new THREE.Quaternion();
+    if (locked) return;
 
-      markerVideo.object3D.getWorldPosition(worldPos);
-      markerVideo.object3D.getWorldQuaternion(worldQuat);
+    const pos = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
 
-      // Apply to world video
-      worldVideo.object3D.position.copy(worldPos);
-      worldVideo.object3D.quaternion.copy(worldQuat);
+    markerVideo.object3D.getWorldPosition(pos);
+    markerVideo.object3D.getWorldQuaternion(quat);
 
-      worldVideo.setAttribute("visible", "true");
+    worldVideo.object3D.position.copy(pos);
+    worldVideo.object3D.quaternion.copy(quat);
 
-      // Optional: hide marker version
-      markerVideo.setAttribute("visible", "false");
+    worldVideo.setAttribute("visible", true);
+    markerVideo.setAttribute("visible", false);
 
-      locked = true;
-    });
-  }
+    locked = true;
+  });
+
+  marker.addEventListener("markerLost", () => {
+    console.log("MARKER LOST");
+  });
 });
-
-// Attach component
-document.querySelector("a-scene").setAttribute("persist-on-marker", "");
 </script>
 
 
