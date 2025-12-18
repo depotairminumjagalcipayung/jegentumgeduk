@@ -1,37 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>QR Marker Video AR</title>
+  <meta charset="utf-8">
+  <title>AR.js Marker Trigger HUD Video</title>
 
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+  <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+
+  <!-- Camera-space distance scaling -->
+  <script>
+    AFRAME.registerComponent("scale-by-z", {
+      schema: {
+        baseWidth:  { default: 1.6 },
+        baseHeight: { default: 0.9 },
+        minZ:       { default: -3.0 },
+        maxZ:       { default: -1.2 }
+      },
+
+      tick() {
+        const z = this.el.object3D.position.z;
+
+        const t = THREE.MathUtils.clamp(
+          (z - this.data.minZ) / (this.data.maxZ - this.data.minZ),
+          0, 1
+        );
+
+        const scale = THREE.MathUtils.lerp(0.6, 1.4, t);
+
+        this.el.setAttribute("width",  this.data.baseWidth  * scale);
+        this.el.setAttribute("height", this.data.baseHeight * scale);
+      }
+    });
+  </script>
 </head>
 
-<body style="margin:0; overflow:hidden;">
+<body>
 
 <a-scene
   embedded
-  arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+  arjs="sourceType: webcam; debugUIEnabled: false;"
+  renderer="antialias: false; precision: low;"
 >
 
-  <!-- QR CODE AS MARKER -->
+  <!-- MARKER USED ONLY AS TRIGGER -->
   <a-marker
+    id="triggerMarker"
     type="pattern"
     url="pattern-qr.patt"
-  >
+    emitevents="true"
+  ></a-marker>
 
-    <!-- Video anchored to QR -->
-    <a-entity
-      geometry="primitive: plane; width: 8; height: 4.5"
-      material="shader: flat; src: #vid; side: double"
-      position="0 0 0"
+  <!-- Camera -->
+  <a-entity camera>
+
+    <!-- CAMERA-SPACE VIDEO (HUD) -->
+    <a-video
+      id="videoHUD"
+      src="#vid"
+      width="1.6"
+      height="0.9"
+      position="0 0 -2"
       rotation="0 0 0"
-    ></a-entity>
+      visible="false"
+      scale-by-z
+      autoplay
+      loop
+      muted
+      playsinline
+      webkit-playsinline
+    ></a-video>
 
-  </a-marker>
+  </a-entity>
 
-  <a-entity camera></a-entity>
 </a-scene>
 
 <!-- Video asset -->
@@ -44,6 +91,32 @@
   playsinline
   webkit-playsinline
 ></video>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+
+  const marker = document.querySelector("#triggerMarker");
+  const video  = document.querySelector("#videoHUD");
+  const scene  = document.querySelector("a-scene");
+
+  let activated = false;
+
+  marker.addEventListener("markerFound", () => {
+    if (activated) return;
+    activated = true;
+
+    // Show HUD video
+    video.setAttribute("visible", true);
+
+    // Disable marker tracking for performance
+    scene.setAttribute("arjs", "trackingMethod: none;");
+
+    // Remove marker entity entirely
+    marker.parentNode.removeChild(marker);
+  });
+
+});
+</script>
 
 </body>
 </html>
