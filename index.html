@@ -2,19 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AR.js Marker Trigger HUD Video</title>
+  <title>AR.js Marker Trigger HUD Video (FINAL FIX)</title>
 
-  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-
-  <!-- AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
+    body { margin: 0; overflow: hidden; }
   </style>
 </head>
 
@@ -26,7 +20,7 @@
   renderer="antialias: false; precision: low;"
 >
 
-  <!-- MARKER USED ONLY AS TRIGGER -->
+  <!-- Marker ONLY as trigger -->
   <a-marker
     id="triggerMarker"
     type="pattern"
@@ -37,11 +31,10 @@
   <!-- Camera -->
   <a-entity camera>
 
-    <!-- CAMERA-SPACE VIDEO (HUD) -->
+    <!-- HUD VIDEO (NO SRC INITIALLY) -->
     <a-video
       id="videoHUD"
-      src="#vid"
-      width="3.2"   <!-- 2x bigger -->
+      width="3.2"
       height="1.8"
       position="0 0 -2"
       visible="false"
@@ -54,7 +47,7 @@
 
 </a-scene>
 
-<!-- Video asset (NO autoplay = no flash) -->
+<!-- Video element (NO autoplay) -->
 <video
   id="vid"
   src="video.mp4"
@@ -62,6 +55,7 @@
   muted
   playsinline
   webkit-playsinline
+  preload="auto"
 ></video>
 
 <script>
@@ -74,23 +68,27 @@ window.addEventListener("DOMContentLoaded", () => {
 
   let activated = false;
 
-  marker.addEventListener("markerFound", async () => {
+  marker.addEventListener("markerFound", () => {
     if (activated) return;
     activated = true;
 
-    // Start video ONLY after marker is detected
-    try {
-      await videoEl.play();
-    } catch (e) {
-      console.warn("Video play blocked until user interaction");
-    }
+    // 1️⃣ Bind video texture ONLY now (prevents flash)
+    videoEntity.setAttribute("src", "#vid");
 
+    // 2️⃣ Make it visible
     videoEntity.setAttribute("visible", true);
 
-    // Disable marker tracking for performance
-    scene.setAttribute("arjs", "trackingMethod: none;");
+    // 3️⃣ Play on next frame (reliable on Android)
+    requestAnimationFrame(async () => {
+      try {
+        await videoEl.play();
+      } catch (e) {
+        console.warn("Playback blocked, waiting for user interaction");
+      }
+    });
 
-    // Remove marker completely
+    // 4️⃣ Disable marker tracking (performance)
+    scene.setAttribute("arjs", "trackingMethod: none;");
     marker.parentNode.removeChild(marker);
   });
 
