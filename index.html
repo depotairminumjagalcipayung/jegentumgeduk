@@ -29,23 +29,18 @@
     id="worldVideo"
     visible="false"
     geometry="primitive: plane; width: 1.6; height: 0.9"
-    material="shader: flat; src: #vid; side: double"
+    material="shader: flat; src: video.mp4; side: double"
     rotation="-90 0 0"
+autoplay
+loop
+muted
+playsinline
+webkit-playsinline
   ></a-entity>
 
   <a-entity camera></a-entity>
 </a-scene>
 
-<!-- Video asset -->
-<video
-  id="vid"
-  src="video.mp4"
-  autoplay
-  loop
-  muted
-  playsinline
-  webkit-playsinline
-></video>
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
