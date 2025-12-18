@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>AR.js Marker Trigger World Video</title>
+  <meta charset="utf-8" />
+  <title>AR.js Marker Video</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -15,65 +15,35 @@
   arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
 >
 
-  <!-- Marker used ONLY as trigger -->
+  <!-- Marker is the anchor -->
   <a-marker
-    id="triggerMarker"
     type="pattern"
-    url="pattern-qr.patt"
-    emitevents="true"
-    visible="false"
-  ></a-marker>
+    url="pattern-marker.patt"
+  >
 
-  <!-- World anchored video plane (NOT a-video) -->
-  <a-entity
-    id="worldVideo"
-    visible="false"
-    geometry="primitive: plane; width: 1.6; height: 0.9"
-    material="shader: flat; src: video.mp4; side: double"
-    rotation="-90 0 0"
-autoplay
-loop
-muted
-playsinline
-webkit-playsinline
-  ></a-entity>
+    <!-- World-stable video (marker-relative) -->
+    <a-entity
+      geometry="primitive: plane; width: 1.6; height: 0.9"
+      material="shader: flat; src: #vid; side: double"
+      position="0 0 0"
+      rotation="-90 0 0"
+    ></a-entity>
+
+  </a-marker>
 
   <a-entity camera></a-entity>
 </a-scene>
 
-
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-
-  const marker = document.querySelector("#triggerMarker");
-  const videoPlane = document.querySelector("#worldVideo");
-
-  let placed = false;
-
-  marker.addEventListener("markerFound", () => {
-    if (placed) return;
-
-    const pos = new THREE.Vector3();
-    marker.object3D.getWorldPosition(pos);
-
-    // World position ONLY
-    videoPlane.object3D.position.copy(pos);
-
-    // Hard world rotation (no camera influence)
-    videoPlane.object3D.rotation.set(
-      -Math.PI / 2,
-      0,
-      0
-    );
-
-    videoPlane.object3D.updateMatrixWorld(true);
-    videoPlane.setAttribute("visible", true);
-
-    placed = true;
-  });
-
-});
-</script>
+<!-- Video asset -->
+<video
+  id="vid"
+  src="video.mp4"
+  autoplay
+  loop
+  muted
+  playsinline
+  webkit-playsinline
+></video>
 
 </body>
 </html>
